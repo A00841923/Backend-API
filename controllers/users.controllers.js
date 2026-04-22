@@ -23,12 +23,12 @@ export const getUser = async (req, res) => {
 
 export const postUser = async (req, res) => {
     const sql = db_connect();
-    const {username, first_name, last_name, birthdate, password, email} = req.body;
+    const {username, first_name, last_name, birthdate, password, email, score} = req.body;
     const salt = getSalt(process.env.SALT_SIZE);
     const hashed = hash(password, salt);
     const salted_hashed = salt + hashed;
-    const text = "Insert into users(username, first_name, last_name, birthdate, password, email) values($1, $2, $3, $4, $5, $6)";
-    const values = [username, first_name, last_name, birthdate, salted_hashed, email];
+    const text = "Insert into users(username, first_name, last_name, birthdate, password, email, score) values($1, $2, $3, $4, $5, $6, $7)";
+    const values = [username, first_name, last_name, birthdate, salted_hashed, email, score];
     const result = await sql.query(text, values);
     res.json(result);
 };
@@ -36,9 +36,9 @@ export const postUser = async (req, res) => {
 export const putUser = async (req, res) => {
     const sql = db_connect();
     const id = req.params.id;
-    const {username, first_name, last_name, birthdate, password, email} = req.body;
-    const text = "Update users set username=$1, first_name=$2, last_name=$3, birthdate=$4, password=$5, email=$6 where user_id=$7";
-    const values = [username, first_name, last_name, birthdate, password, email, id];
+    const {username, first_name, last_name, birthdate, password, email, score} = req.body;
+    const text = "Update users set username=$1, first_name=$2, last_name=$3, birthdate=$4, password=$5, email=$6, score=$7 where user_id=$8";
+    const values = [username, first_name, last_name, birthdate, password, email, score, id];
     const result = await sql.query(text, values);
     res.json(result);
 };
@@ -48,6 +48,18 @@ export const deleteUser = async (req, res) => {
     const id = req.params.id;
     const text = "Delete from users where user_id=$1";
     const values = [id];
+    const result = await sql.query(text, values);
+    res.json(result);
+};
+
+export const putScore = async (req, res) => {
+    const sql = db_connect();
+    const id = req.params.id;
+    const { score } = req.body;
+
+    const text = "UPDATE users SET score=$1 WHERE user_id=$2";
+    const values = [score, id];
+
     const result = await sql.query(text, values);
     res.json(result);
 };
